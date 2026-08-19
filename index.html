@@ -533,23 +533,13 @@
      EVENT GALLERY
 ========================================== -->
 
-<section
-  id="gallery"
-  class="section gallery-section"
->
-
+<section id="gallery" class="section gallery-section">
 
   <div class="section-heading center">
 
-    <p class="eyebrow">
-      SCHOOL LIFE
-    </p>
+    <p class="eyebrow">SCHOOL LIFE</p>
 
-
-    <h2>
-      Events & Photo Gallery
-    </h2>
-
+    <h2>Events & Photo Gallery</h2>
 
     <p>
       Explore memorable moments from Bhargav High School.
@@ -558,34 +548,90 @@
   </div>
 
 
-  <!--
-    EVENT ALBUMS WILL BE AUTOMATICALLY
-    LOADED HERE BY script.js
-  -->
+  <div class="gallery-grid" id="event-gallery">
 
-  <div
-    class="gallery-grid"
-    id="event-gallery"
-  >
+    <!-- SINGLE PHOTO -->
 
-    <div class="empty-photo gallery-loading">
+    <figure class="gallery-card single-photo">
 
-      <span>📸</span>
+      <img
+        src="building.jpg"
+        alt="Bhargav High School Campus"
+      >
 
-      <strong>
-        Loading Event Albums...
-      </strong>
+      <figcaption>
 
-      <small>
-        Please wait
-      </small>
+        <strong>Our Campus</strong>
 
-    </div>
+        <span>Bhargav High School</span>
+
+      </figcaption>
+
+    </figure>
+
+
+    <!-- SINGLE PHOTO -->
+
+    <figure class="gallery-card single-photo">
+
+      <img
+        src="Student%20Cabinet%20-%202026-27.jpeg"
+        alt="Bhargav High School Student Cabinet"
+      >
+
+      <figcaption>
+
+        <strong>Student Cabinet</strong>
+
+        <span>Academic Year 2026–27</span>
+
+      </figcaption>
+
+    </figure>
+
+
+    <!-- EVENT ALBUMS ARE AUTOMATICALLY ADDED HERE -->
 
   </div>
 
 </section>
 
+
+<!-- EVENT ALBUM POPUP -->
+
+<div
+  class="album-modal"
+  id="album-modal"
+>
+
+  <div class="album-overlay"></div>
+
+
+  <div class="album-container">
+
+    <button
+      class="album-close"
+      id="album-close"
+      aria-label="Close album"
+    >
+      ×
+    </button>
+
+
+    <h2 id="album-title">
+      Event Photos
+    </h2>
+
+
+    <div
+      class="album-grid"
+      id="album-grid"
+    >
+    </div>
+
+  </div>
+
+</div>
 
 
 <!-- ==========================================
