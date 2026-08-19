@@ -1,278 +1,190 @@
 const menuToggle = document.querySelector(".menu-toggle");
 const nav = document.querySelector(".nav");
 
-
-// ===============================
-// MOBILE MENU
-// ===============================
-
-menuToggle.addEventListener("click", () => {
-
-  const open = nav.classList.toggle("open");
-
-  menuToggle.setAttribute(
-    "aria-expanded",
-    open ? "true" : "false"
-  );
-
-  menuToggle.textContent = open ? "✕" : "☰";
-
-});
-
-
-document.querySelectorAll(".nav a").forEach(link => {
-
-  link.addEventListener("click", () => {
-
-    nav.classList.remove("open");
+if (menuToggle && nav) {
+  menuToggle.addEventListener("click", () => {
+    const open = nav.classList.toggle("open");
 
     menuToggle.setAttribute(
       "aria-expanded",
-      "false"
+      open ? "true" : "false"
     );
 
-    menuToggle.textContent = "☰";
-
+    menuToggle.textContent = open ? "✕" : "☰";
   });
 
-});
+  document.querySelectorAll(".nav a").forEach(link => {
+    link.addEventListener("click", () => {
+      nav.classList.remove("open");
+      menuToggle.setAttribute("aria-expanded", "false");
+      menuToggle.textContent = "☰";
+    });
+  });
+}
 
 
-// ===============================
-// EVENT ALBUM GALLERY
-// ===============================
+/* =====================================================
+   EVENT ALBUMS
+===================================================== */
 
-const gallery = document.getElementById("event-gallery");
+const eventGallery = document.getElementById("event-gallery");
 const albumModal = document.getElementById("album-modal");
 const albumGrid = document.getElementById("album-grid");
 const albumTitle = document.getElementById("album-title");
 const albumClose = document.getElementById("album-close");
 
 
-async function loadEventAlbums() {
+/*
+   Add your event folders here.
 
-  if (!gallery) return;
+   To add another event later, simply add another object.
+*/
 
-  const apiURL =
-    "https://api.github.com/repos/bhargavschool/bhargav-high-school/contents/images/events";
+const events = [
+
+  {
+    name: "Independence Day",
+    folder: "independence-day",
+    cover: "independence-day-cover.jpg",
+
+    photos: [
+      "photo1.jpeg",
+      "photo2.jpeg",
+      "photo3.jpeg",
+      "photo4.jpeg",
+      "photo5.jpeg",
+      "photo6.jpeg",
+      "photo7.jpeg",
+      "photo8.jpeg",
+      "photo9.jpeg",
+      "photo10.jpeg"
+    ]
+  }
+
+];
 
 
-  try {
+function createEventAlbums() {
 
-    const response = await fetch(apiURL);
+  if (!eventGallery) return;
 
-    if (!response.ok) {
-      throw new Error("Unable to access events folder");
-    }
+  events.forEach(event => {
 
-    const items = await response.json();
+    const card = document.createElement("figure");
 
-    const eventFolders = items.filter(
-      item => item.type === "dir"
-    );
+    card.className = "gallery-card event-album";
 
 
-    gallery.innerHTML = "";
+    const image = document.createElement("img");
+
+    image.src =
+      `images/events/${event.folder}/${event.cover}`;
+
+    image.alt =
+      `${event.name} cover photo`;
+
+    image.loading = "lazy";
 
 
-    if (eventFolders.length === 0) {
+    image.onerror = function () {
 
-      gallery.innerHTML = `
-        <div class="empty-photo gallery-loading">
-          <span>📸</span>
-          <strong>Event Albums Coming Soon</strong>
-          <small>Add event folders inside images/events</small>
-        </div>
+      console.error(
+        "Cover image not found:",
+        image.src
+      );
+
+      image.style.display = "none";
+
+      const fallback =
+        document.createElement("div");
+
+      fallback.className = "empty-photo";
+
+      fallback.innerHTML = `
+        <span>📸</span>
+        <strong>${event.name}</strong>
+        <small>Cover photo unavailable</small>
       `;
 
-      return;
-    }
+      card.insertBefore(
+        fallback,
+        card.firstChild
+      );
+    };
 
 
-    // Load each event folder
+    const caption =
+      document.createElement("figcaption");
 
-    for (const folder of eventFolders) {
-
-      try {
-
-        const folderResponse =
-          await fetch(folder.url);
-
-        if (!folderResponse.ok) continue;
-
-        const photos =
-          await folderResponse.json();
-
-
-        const imageFiles = photos.filter(photo =>
-          photo.type === "file" &&
-          /\.(jpg|jpeg|png|webp|gif)$/i.test(photo.name)
-        );
-
-
-        if (imageFiles.length === 0) continue;
-
-
-        // Find cover.jpg
-
-        let coverPhoto =
-          imageFiles.find(photo =>
-            photo.name.toLowerCase() === "cover.jpg"
-          );
-
-
-        // If cover doesn't exist,
-        // use first image
-
-        if (!coverPhoto) {
-          coverPhoto = imageFiles[0];
-        }
-
-
-        // Event name
-
-        const eventName =
-          folder.name
-            .replace(/[-_]/g, " ")
-            .replace(/\b\w/g, letter =>
-              letter.toUpperCase()
-            );
-
-
-        // ===============================
-        // CREATE EVENT CARD
-        // ===============================
-
-        const figure =
-          document.createElement("figure");
-
-        figure.className =
-          "gallery-card event-album";
-
-
-        const img =
-          document.createElement("img");
-
-        img.src =
-          coverPhoto.download_url;
-
-        img.alt =
-          eventName;
-
-        img.loading =
-          "lazy";
-
-
-        const caption =
-          document.createElement("figcaption");
-
-
-        const title =
-          document.createElement("strong");
-
-        title.textContent =
-          eventName;
-
-
-        const subtitle =
-          document.createElement("span");
-
-        subtitle.textContent =
-          `${imageFiles.length} ${
-            imageFiles.length === 1
-              ? "Photo"
-              : "Photos"
-          } • Click to View`;
-
-
-        caption.appendChild(title);
-        caption.appendChild(subtitle);
-
-
-        figure.appendChild(img);
-        figure.appendChild(caption);
-
-
-        // Open album when clicked
-
-        figure.addEventListener("click", () => {
-
-          openAlbum(
-            eventName,
-            imageFiles
-          );
-
-        });
-
-
-        gallery.appendChild(figure);
-
-      }
-
-      catch (error) {
-
-        console.error(
-          "Album loading error:",
-          folder.name,
-          error
-        );
-
-      }
-
-    }
-
-  }
-
-  catch (error) {
-
-    console.error(
-      "Gallery error:",
-      error
-    );
-
-
-    gallery.innerHTML = `
-      <div class="empty-photo gallery-loading">
-        <span>📸</span>
-        <strong>Gallery Temporarily Unavailable</strong>
-        <small>Please try again later.</small>
-      </div>
+    caption.innerHTML = `
+      <strong>${event.name}</strong>
+      <span>${event.photos.length} Photos • Click to View Album</span>
     `;
 
-  }
+
+    card.appendChild(image);
+
+    card.appendChild(caption);
+
+
+    card.addEventListener("click", () => {
+
+      openAlbum(event);
+
+    });
+
+
+    eventGallery.appendChild(card);
+
+  });
 
 }
 
 
-// ===============================
-// OPEN ALBUM
-// ===============================
+function openAlbum(event) {
 
-function openAlbum(title, photos) {
+  if (!albumModal || !albumGrid || !albumTitle) {
+    return;
+  }
+
 
   albumTitle.textContent =
-    title;
+    event.name;
 
 
   albumGrid.innerHTML = "";
 
 
-  photos.forEach(photo => {
+  event.photos.forEach((photo, index) => {
 
-    const img =
+    const image =
       document.createElement("img");
 
-    img.src =
-      photo.download_url;
 
-    img.alt =
-      title;
-
-    img.loading =
-      "lazy";
+    image.src =
+      `images/events/${event.folder}/${photo}`;
 
 
-    albumGrid.appendChild(img);
+    image.alt =
+      `${event.name} photo ${index + 1}`;
+
+
+    image.loading = "lazy";
+
+
+    image.onerror = function () {
+
+      console.error(
+        "Photo not found:",
+        image.src
+      );
+
+      image.style.display = "none";
+
+    };
+
+
+    albumGrid.appendChild(image);
 
   });
 
@@ -285,11 +197,9 @@ function openAlbum(title, photos) {
 }
 
 
-// ===============================
-// CLOSE ALBUM
-// ===============================
-
 function closeAlbum() {
+
+  if (!albumModal) return;
 
   albumModal.classList.remove("active");
 
@@ -299,29 +209,41 @@ function closeAlbum() {
 }
 
 
-albumClose.addEventListener(
-  "click",
-  closeAlbum
-);
+if (albumClose) {
 
-
-document
-  .querySelector(".album-overlay")
-  .addEventListener(
+  albumClose.addEventListener(
     "click",
     closeAlbum
-);
+  );
+
+}
 
 
-// ESC KEY
+if (albumModal) {
+
+  const overlay =
+    albumModal.querySelector(
+      ".album-overlay"
+    );
+
+  if (overlay) {
+
+    overlay.addEventListener(
+      "click",
+      closeAlbum
+    );
+
+  }
+
+}
+
 
 document.addEventListener(
   "keydown",
   event => {
 
     if (
-      event.key === "Escape" &&
-      albumModal.classList.contains("active")
+      event.key === "Escape"
     ) {
 
       closeAlbum();
@@ -332,8 +254,6 @@ document.addEventListener(
 );
 
 
-// ===============================
-// START
-// ===============================
+/* Start */
 
-loadEventAlbums();
+createEventAlbums();
