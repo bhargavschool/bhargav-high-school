@@ -39,18 +39,19 @@ document.querySelectorAll(".nav a").forEach(link => {
 
 
 // ===============================
-// AUTOMATIC EVENT GALLERY
+// EVENT ALBUM GALLERY
 // ===============================
 
-async function loadEventGallery() {
+const gallery = document.getElementById("event-gallery");
+const albumModal = document.getElementById("album-modal");
+const albumGrid = document.getElementById("album-grid");
+const albumTitle = document.getElementById("album-title");
+const albumClose = document.getElementById("album-close");
 
-  const gallery = document.getElementById("event-gallery");
+
+async function loadEventAlbums() {
 
   if (!gallery) return;
-
-
-  // Automatically detect the current GitHub Pages
-  // username and repository.
 
   const host = window.location.hostname;
 
@@ -61,7 +62,6 @@ async function loadEventGallery() {
       .split("/")
       .filter(Boolean)[0];
 
-
   const apiURL =
     `https://api.github.com/repos/${username}/${repository}/contents/images/events`;
 
@@ -70,128 +70,167 @@ async function loadEventGallery() {
 
     const response = await fetch(apiURL);
 
-
     if (!response.ok) {
-
-      throw new Error(
-        "GitHub folder could not be accessed."
-      );
-
+      throw new Error("Unable to access events folder");
     }
 
+    const items = await response.json();
 
-    const files = await response.json();
 
-
-    // Only display image files
-
-    const imageFiles = files.filter(file => {
-
-      return (
-        file.type === "file" &&
-        /\.(jpg|jpeg|png|webp|gif)$/i.test(file.name)
-      );
-
-    });
+    // Find event folders
+    const eventFolders = items.filter(item =>
+      item.type === "dir"
+    );
 
 
     gallery.innerHTML = "";
 
 
-    // No event photos yet
-
-    if (imageFiles.length === 0) {
+    if (eventFolders.length === 0) {
 
       gallery.innerHTML = `
-
         <div class="empty-photo gallery-loading">
-
           <span>📸</span>
-
-          <strong>
-            Event Photos Coming Soon
-          </strong>
-
-          <small>
-            School event photos will appear here.
-          </small>
-
+          <strong>Event Albums Coming Soon</strong>
+          <small>Create event folders inside images/events</small>
         </div>
-
       `;
 
       return;
-
     }
 
 
-    // Display every photo
+    // Create an album for every event folder
 
-    imageFiles.forEach(file => {
+    for (const folder of eventFolders) {
 
-      const figure =
-        document.createElement("figure");
+      try {
 
-      figure.className =
-        "gallery-card";
+        const folderResponse =
+          await fetch(folder.url);
 
+        if (!folderResponse.ok) continue;
 
-      const img =
-        document.createElement("img");
-
-      img.src =
-        file.download_url;
-
-      img.alt =
-        "Bhargav High School Event";
-
-      img.loading =
-        "lazy";
+        const photos =
+          await folderResponse.json();
 
 
-      const caption =
-        document.createElement("figcaption");
+        const imageFiles = photos.filter(photo =>
+          photo.type === "file" &&
+          /\.(jpg|jpeg|png|webp|gif)$/i.test(photo.name)
+        );
 
 
-      const title =
-        document.createElement("strong");
+        if (imageFiles.length === 0) continue;
 
 
-      // Convert filename into readable title
-
-      const cleanName =
-        file.name
-          .replace(/\.[^/.]+$/, "")
-          .replace(/[-_]/g, " ");
-
-
-      title.textContent =
-        cleanName;
+        // Find cover.jpg
+        let coverPhoto =
+          imageFiles.find(photo =>
+            photo.name.toLowerCase() === "cover.jpg"
+          );
 
 
-      const subtitle =
-        document.createElement("span");
+        // If cover.jpg doesn't exist,
+        // use the first photo
 
-      subtitle.textContent =
-        "Bhargav High School";
-
-
-      caption.appendChild(title);
-
-      caption.appendChild(subtitle);
+        if (!coverPhoto) {
+          coverPhoto = imageFiles[0];
+        }
 
 
-      figure.appendChild(img);
+        // Event title
 
-      figure.appendChild(caption);
+        const eventName =
+          folder.name
+            .replace(/[-_]/g, " ")
+            .replace(/\b\w/g, letter =>
+              letter.toUpperCase()
+            );
 
 
-      gallery.appendChild(figure);
+        // Create gallery card
 
-    });
+        const figure =
+          document.createElement("figure");
+
+        figure.className =
+          "gallery-card event-album";
 
 
-  } catch (error) {
+        const img =
+          document.createElement("img");
+
+        img.src =
+          coverPhoto.download_url;
+
+        img.alt =
+          eventName;
+
+
+        const caption =
+          document.createElement("figcaption");
+
+
+        const title =
+          document.createElement("strong");
+
+        title.textContent =
+          eventName;
+
+
+        const subtitle =
+          document.createElement("span");
+
+        subtitle.textContent =
+          `${imageFiles.length} ${
+            imageFiles.length === 1
+              ? "Photo"
+              : "Photos"
+          } • Click to View`;
+
+
+        caption.appendChild(title);
+
+        caption.appendChild(subtitle);
+
+
+        figure.appendChild(img);
+
+        figure.appendChild(caption);
+
+
+        // Open album
+
+        figure.addEventListener("click", () => {
+
+          openAlbum(
+            eventName,
+            imageFiles
+          );
+
+        });
+
+
+        gallery.appendChild(figure);
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "Unable to load album:",
+          folder.name,
+          error
+        );
+
+      }
+
+    }
+
+  }
+
+  catch (error) {
 
     console.error(
       "Gallery error:",
@@ -200,21 +239,11 @@ async function loadEventGallery() {
 
 
     gallery.innerHTML = `
-
       <div class="empty-photo gallery-loading">
-
         <span>📸</span>
-
-        <strong>
-          Event Photos Coming Soon
-        </strong>
-
-        <small>
-          Add photos to the images/events folder.
-        </small>
-
+        <strong>Event Albums Coming Soon</strong>
+        <small>Add event folders to images/events</small>
       </div>
-
     `;
 
   }
@@ -222,4 +251,104 @@ async function loadEventGallery() {
 }
 
 
-loadEventGallery();
+// ===============================
+// OPEN ALBUM
+// ===============================
+
+function openAlbum(title, photos) {
+
+  albumTitle.textContent = title;
+
+  albumGrid.innerHTML = "";
+
+
+  photos.forEach(photo => {
+
+    const img =
+      document.createElement("img");
+
+    img.src =
+      photo.download_url;
+
+    img.alt =
+      title;
+
+    img.loading =
+      "lazy";
+
+
+    // Click image to open larger version
+
+    img.addEventListener("click", () => {
+
+      window.open(
+        photo.download_url,
+        "_blank"
+      );
+
+    });
+
+
+    albumGrid.appendChild(img);
+
+  });
+
+
+  albumModal.classList.add("active");
+
+  document.body.style.overflow =
+    "hidden";
+
+}
+
+
+// ===============================
+// CLOSE ALBUM
+// ===============================
+
+function closeAlbum() {
+
+  albumModal.classList.remove("active");
+
+  document.body.style.overflow =
+    "";
+
+}
+
+
+albumClose.addEventListener(
+  "click",
+  closeAlbum
+);
+
+
+document
+  .querySelector(".album-overlay")
+  .addEventListener(
+    "click",
+    closeAlbum
+);
+
+
+// ESC KEY
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if (
+      event.key === "Escape" &&
+      albumModal.classList.contains("active")
+    ) {
+
+      closeAlbum();
+
+    }
+
+  }
+);
+
+
+// START GALLERY
+
+loadEventAlbums();
