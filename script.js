@@ -1,10 +1,16 @@
+// =====================================================
+// BHARGAV HIGH SCHOOL
+// COMPLETE SCRIPT.JS
+// =====================================================
+
+
+// =====================================================
+// MOBILE MENU
+// =====================================================
+
 const menuToggle = document.querySelector(".menu-toggle");
 const nav = document.querySelector(".nav");
 
-
-// ===============================
-// MOBILE MENU
-// ===============================
 
 if (menuToggle && nav) {
 
@@ -17,9 +23,11 @@ if (menuToggle && nav) {
       open ? "true" : "false"
     );
 
-    menuToggle.textContent = open ? "✕" : "☰";
+    menuToggle.textContent =
+      open ? "✕" : "☰";
 
   });
+
 
   document.querySelectorAll(".nav a").forEach(link => {
 
@@ -41,9 +49,10 @@ if (menuToggle && nav) {
 }
 
 
-// ===============================
-// EVENT GALLERY
-// ===============================
+
+// =====================================================
+// GALLERY ELEMENTS
+// =====================================================
 
 const eventGallery =
   document.getElementById("event-gallery");
@@ -61,11 +70,26 @@ const albumClose =
   document.getElementById("album-close");
 
 
-// ===============================
-// EVENT DATA
-// ===============================
+
+// =====================================================
+// WEBSITE BASE URL
+// =====================================================
+
+const BASE_URL =
+  "https://bhargavschool.github.io/bhargav-high-school/";
+
+
+
+// =====================================================
+// EVENT ALBUMS
+// =====================================================
 
 const events = [
+
+
+  // ===================================================
+  // INDEPENDENCE DAY
+  // ===================================================
 
   {
     name: "Independence Day",
@@ -75,16 +99,47 @@ const events = [
     cover: "photo1.jpeg",
 
     photos: [
+
       "photo1.jpeg",
+
       "photo2.jpeg",
+
       "photo3.jpeg",
+
       "photo4.jpeg",
+
       "photo5.jpeg",
+
       "photo6.jpeg",
+
       "photo7.jpeg",
+
       "photo8.jpeg",
+
       "photo9.jpeg",
+
       "photo10.jpeg"
+
+    ]
+
+  },
+
+
+  // ===================================================
+  // STUDENT CABINET
+  // ===================================================
+
+  {
+    name: "Student Cabinet",
+
+    folder: "",
+
+    cover: "student-cabinet.jpeg",
+
+    photos: [
+
+      "student-cabinet.jpeg"
+
     ]
 
   }
@@ -92,41 +147,62 @@ const events = [
 ];
 
 
-// ===============================
-// GITHUB PAGES BASE URL
-// ===============================
 
-const BASE_URL =
-  "https://bhargavschool.github.io/bhargav-high-school/";
-
-
-// ===============================
-// IMAGE URL
-// ===============================
+// =====================================================
+// CREATE PHOTO URL
+// =====================================================
 
 function getPhotoURL(folder, filename) {
+
+  if (folder && folder.trim() !== "") {
+
+    return (
+      BASE_URL +
+      "images/events/" +
+      folder +
+      "/" +
+      filename
+    );
+
+  }
+
 
   return (
     BASE_URL +
     "images/events/" +
-    folder +
-    "/" +
     filename
   );
 
 }
 
 
-// ===============================
-// CREATE EVENT CARD
-// ===============================
+
+// =====================================================
+// CREATE EVENT CARDS
+// =====================================================
 
 function createEventAlbums() {
 
-  if (!eventGallery) return;
+  if (!eventGallery) {
+
+    console.error(
+      "Gallery container #event-gallery was not found."
+    );
+
+    return;
+
+  }
+
+
+  eventGallery.innerHTML = "";
 
 
   events.forEach(event => {
+
+
+    // -----------------------------------------------
+    // CARD
+    // -----------------------------------------------
 
     const card =
       document.createElement("figure");
@@ -134,6 +210,10 @@ function createEventAlbums() {
     card.className =
       "gallery-card event-album";
 
+
+    // -----------------------------------------------
+    // COVER IMAGE
+    // -----------------------------------------------
 
     const image =
       document.createElement("img");
@@ -150,41 +230,78 @@ function createEventAlbums() {
       event.name;
 
 
-    image.loading = "eager";
+    image.loading =
+      "eager";
 
 
     image.onerror = function () {
 
       console.error(
-        "Cover could not load:",
+        "Image failed to load:",
         image.src
       );
 
     };
 
 
+    // -----------------------------------------------
+    // CAPTION
+    // -----------------------------------------------
+
     const caption =
       document.createElement("figcaption");
 
 
-    caption.innerHTML = `
-      <strong>${event.name}</strong>
-      <span>
-        ${event.photos.length} Photos • Click to View Album
-      </span>
-    `;
+    const title =
+      document.createElement("strong");
 
+
+    title.textContent =
+      event.name;
+
+
+    const subtitle =
+      document.createElement("span");
+
+
+    subtitle.textContent =
+      event.photos.length +
+      " Photo" +
+      (event.photos.length === 1 ? "" : "s") +
+      " • Click to View Album";
+
+
+    caption.appendChild(title);
+
+    caption.appendChild(subtitle);
+
+
+    // -----------------------------------------------
+    // ADD TO CARD
+    // -----------------------------------------------
 
     card.appendChild(image);
 
     card.appendChild(caption);
 
 
+    // -----------------------------------------------
+    // CLICK
+    // -----------------------------------------------
+
     card.addEventListener(
       "click",
-      () => openAlbum(event)
+      () => {
+
+        openAlbum(event);
+
+      }
     );
 
+
+    // -----------------------------------------------
+    // ADD CARD TO GALLERY
+    // -----------------------------------------------
 
     eventGallery.appendChild(card);
 
@@ -193,9 +310,10 @@ function createEventAlbums() {
 }
 
 
-// ===============================
+
+// =====================================================
 // OPEN ALBUM
-// ===============================
+// =====================================================
 
 function openAlbum(event) {
 
@@ -206,7 +324,7 @@ function openAlbum(event) {
   ) {
 
     console.error(
-      "Album HTML elements are missing."
+      "Album popup elements are missing from index.html."
     );
 
     return;
@@ -214,15 +332,28 @@ function openAlbum(event) {
   }
 
 
+  // -----------------------------------------------
+  // TITLE
+  // -----------------------------------------------
+
   albumTitle.textContent =
     event.name;
 
 
+  // -----------------------------------------------
+  // CLEAR OLD PHOTOS
+  // -----------------------------------------------
+
   albumGrid.innerHTML = "";
 
 
+  // -----------------------------------------------
+  // ADD PHOTOS
+  // -----------------------------------------------
+
   event.photos.forEach(
     (photo, index) => {
+
 
       const image =
         document.createElement("img");
@@ -236,20 +367,45 @@ function openAlbum(event) {
 
 
       image.alt =
-        `${event.name} photo ${index + 1}`;
+        event.name +
+        " photo " +
+        (index + 1);
 
 
-      image.loading = "lazy";
+      image.loading =
+        "lazy";
 
 
-      albumGrid.appendChild(image);
+      image.onerror = function () {
+
+        console.error(
+          "Album image failed to load:",
+          image.src
+        );
+
+      };
+
+
+      albumGrid.appendChild(
+        image
+      );
 
     }
   );
 
 
+  // -----------------------------------------------
+  // SHOW MODAL
+  // -----------------------------------------------
+
   albumModal.classList.add(
     "active"
+  );
+
+
+  albumModal.setAttribute(
+    "aria-hidden",
+    "false"
   );
 
 
@@ -259,9 +415,10 @@ function openAlbum(event) {
 }
 
 
-// ===============================
+
+// =====================================================
 // CLOSE ALBUM
-// ===============================
+// =====================================================
 
 function closeAlbum() {
 
@@ -273,11 +430,22 @@ function closeAlbum() {
   );
 
 
+  albumModal.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+
+
   document.body.style.overflow =
     "";
 
 }
 
+
+
+// =====================================================
+// CLOSE BUTTON
+// =====================================================
 
 if (albumClose) {
 
@@ -288,6 +456,11 @@ if (albumClose) {
 
 }
 
+
+
+// =====================================================
+// CLOSE BY CLICKING OUTSIDE
+// =====================================================
 
 if (albumModal) {
 
@@ -309,11 +482,20 @@ if (albumModal) {
 }
 
 
+
+// =====================================================
+// CLOSE WITH ESC KEY
+// =====================================================
+
 document.addEventListener(
   "keydown",
   event => {
 
-    if (event.key === "Escape") {
+    if (
+      event.key === "Escape" &&
+      albumModal &&
+      albumModal.classList.contains("active")
+    ) {
 
       closeAlbum();
 
@@ -323,8 +505,9 @@ document.addEventListener(
 );
 
 
-// ===============================
-// START
-// ===============================
+
+// =====================================================
+// START GALLERY
+// =====================================================
 
 createEventAlbums();
