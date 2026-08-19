@@ -17,11 +17,9 @@ if (menuToggle && nav) {
       open ? "true" : "false"
     );
 
-    menuToggle.textContent =
-      open ? "✕" : "☰";
+    menuToggle.textContent = open ? "✕" : "☰";
 
   });
-
 
   document.querySelectorAll(".nav a").forEach(link => {
 
@@ -44,7 +42,7 @@ if (menuToggle && nav) {
 
 
 // ===============================
-// GALLERY
+// EVENT GALLERY
 // ===============================
 
 const eventGallery =
@@ -64,7 +62,7 @@ const albumClose =
 
 
 // ===============================
-// EVENTS
+// EVENT DATA
 // ===============================
 
 const events = [
@@ -95,12 +93,16 @@ const events = [
 
 
 // ===============================
-// BASE URL
+// GITHUB PAGES BASE URL
 // ===============================
 
 const BASE_URL =
   "https://bhargavschool.github.io/bhargav-high-school/";
 
+
+// ===============================
+// IMAGE URL
+// ===============================
 
 function getPhotoURL(folder, filename) {
 
@@ -148,21 +150,15 @@ function createEventAlbums() {
       event.name;
 
 
-    image.loading = "lazy";
+    image.loading = "eager";
 
 
     image.onerror = function () {
 
       console.error(
-        "Unable to load:",
+        "Cover could not load:",
         image.src
       );
-
-      image.src =
-        getPhotoURL(
-          event.folder,
-          event.photos[0]
-        );
 
     };
 
@@ -172,16 +168,10 @@ function createEventAlbums() {
 
 
     caption.innerHTML = `
-
-      <strong>
-        ${event.name}
-      </strong>
-
+      <strong>${event.name}</strong>
       <span>
-        ${event.photos.length}
-        Photos • Click to View Album
+        ${event.photos.length} Photos • Click to View Album
       </span>
-
     `;
 
 
@@ -250,16 +240,6 @@ function openAlbum(event) {
 
 
       image.loading = "lazy";
-
-
-      image.onerror = function () {
-
-        console.error(
-          "Photo unavailable:",
-          image.src
-        );
-
-      };
 
 
       albumGrid.appendChild(image);
@@ -344,7 +324,7 @@ document.addEventListener(
 
 
 // ===============================
-// START GALLERY
+// START
 // ===============================
 
 createEventAlbums();
