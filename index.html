@@ -422,55 +422,47 @@
 
 
 <!-- ================= AUTOMATIC GALLERY ================= -->
-
 <section id="gallery" class="section gallery-section">
 
   <div class="section-heading center">
-
-    <p class="eyebrow">
-      SCHOOL LIFE
-    </p>
-
-    <h2>
-      Events & Photo Gallery
-    </h2>
-
-    <p>
-      Explore memorable moments from Bhargav High School.
-    </p>
-
+    <p class="eyebrow">SCHOOL LIFE</p>
+    <h2>Events & Photo Gallery</h2>
+    <p>Explore memorable moments from Bhargav High School.</p>
   </div>
 
-
-  <!--
-    JavaScript will automatically load
-    photos from:
-
-    images/events/
-  -->
-
-  <div
-    class="gallery-grid"
-    id="event-gallery"
-  >
+  <div class="gallery-grid" id="event-gallery">
 
     <div class="empty-photo gallery-loading">
-
       <span>📸</span>
-
-      <strong>
-        Loading Gallery...
-      </strong>
-
-      <small>
-        Please wait
-      </small>
-
+      <strong>Loading Gallery...</strong>
+      <small>Please wait</small>
     </div>
 
   </div>
 
 </section>
+
+<!-- EVENT ALBUM LIGHTBOX -->
+
+<div class="album-modal" id="album-modal">
+
+  <div class="album-overlay"></div>
+
+  <div class="album-container">
+
+    <button class="album-close" id="album-close">
+      ×
+    </button>
+
+    <h2 id="album-title">
+      Event Photos
+    </h2>
+
+    <div class="album-grid" id="album-grid"></div>
+
+  </div>
+
+</div>
 
 
 <!-- ================= ADMISSIONS ================= -->
