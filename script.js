@@ -53,17 +53,8 @@ async function loadEventAlbums() {
 
   if (!gallery) return;
 
-  const host = window.location.hostname;
-
-  const username = host.split(".")[0];
-
-  const repository =
-    window.location.pathname
-      .split("/")
-      .filter(Boolean)[0];
-
   const apiURL =
-    `https://api.github.com/repos/${username}/${repository}/contents/images/events`;
+    "https://api.github.com/repos/bhargavschool/bhargav-high-school/contents/images/events";
 
 
   try {
@@ -76,10 +67,8 @@ async function loadEventAlbums() {
 
     const items = await response.json();
 
-
-    // Find event folders
-    const eventFolders = items.filter(item =>
-      item.type === "dir"
+    const eventFolders = items.filter(
+      item => item.type === "dir"
     );
 
 
@@ -92,7 +81,7 @@ async function loadEventAlbums() {
         <div class="empty-photo gallery-loading">
           <span>📸</span>
           <strong>Event Albums Coming Soon</strong>
-          <small>Create event folders inside images/events</small>
+          <small>Add event folders inside images/events</small>
         </div>
       `;
 
@@ -100,7 +89,7 @@ async function loadEventAlbums() {
     }
 
 
-    // Create an album for every event folder
+    // Load each event folder
 
     for (const folder of eventFolders) {
 
@@ -125,21 +114,22 @@ async function loadEventAlbums() {
 
 
         // Find cover.jpg
+
         let coverPhoto =
           imageFiles.find(photo =>
             photo.name.toLowerCase() === "cover.jpg"
           );
 
 
-        // If cover.jpg doesn't exist,
-        // use the first photo
+        // If cover doesn't exist,
+        // use first image
 
         if (!coverPhoto) {
           coverPhoto = imageFiles[0];
         }
 
 
-        // Event title
+        // Event name
 
         const eventName =
           folder.name
@@ -149,7 +139,9 @@ async function loadEventAlbums() {
             );
 
 
-        // Create gallery card
+        // ===============================
+        // CREATE EVENT CARD
+        // ===============================
 
         const figure =
           document.createElement("figure");
@@ -166,6 +158,9 @@ async function loadEventAlbums() {
 
         img.alt =
           eventName;
+
+        img.loading =
+          "lazy";
 
 
         const caption =
@@ -191,16 +186,14 @@ async function loadEventAlbums() {
 
 
         caption.appendChild(title);
-
         caption.appendChild(subtitle);
 
 
         figure.appendChild(img);
-
         figure.appendChild(caption);
 
 
-        // Open album
+        // Open album when clicked
 
         figure.addEventListener("click", () => {
 
@@ -219,7 +212,7 @@ async function loadEventAlbums() {
       catch (error) {
 
         console.error(
-          "Unable to load album:",
+          "Album loading error:",
           folder.name,
           error
         );
@@ -241,8 +234,8 @@ async function loadEventAlbums() {
     gallery.innerHTML = `
       <div class="empty-photo gallery-loading">
         <span>📸</span>
-        <strong>Event Albums Coming Soon</strong>
-        <small>Add event folders to images/events</small>
+        <strong>Gallery Temporarily Unavailable</strong>
+        <small>Please try again later.</small>
       </div>
     `;
 
@@ -257,7 +250,9 @@ async function loadEventAlbums() {
 
 function openAlbum(title, photos) {
 
-  albumTitle.textContent = title;
+  albumTitle.textContent =
+    title;
+
 
   albumGrid.innerHTML = "";
 
@@ -275,18 +270,6 @@ function openAlbum(title, photos) {
 
     img.loading =
       "lazy";
-
-
-    // Click image to open larger version
-
-    img.addEventListener("click", () => {
-
-      window.open(
-        photo.download_url,
-        "_blank"
-      );
-
-    });
 
 
     albumGrid.appendChild(img);
@@ -349,6 +332,8 @@ document.addEventListener(
 );
 
 
-// START GALLERY
+// ===============================
+// START
+// ===============================
 
 loadEventAlbums();
